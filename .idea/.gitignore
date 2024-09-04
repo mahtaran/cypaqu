@@ -1,3 +1,12 @@
-# Default ignored files
-/shelf/
-/workspace.xml
+# Based on https://github.com/github/gitignore
+
+# JetBrains
+caches/
+
+## Generated
+modules.xml
+modules/
+
+## User-specific
+workspace.xml
+shelf/
