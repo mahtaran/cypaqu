@@ -4,6 +4,7 @@
 caches/
 
 ## Generated
+androidTestResultsUserPreferences.xml
 modules.xml
 modules/
 
