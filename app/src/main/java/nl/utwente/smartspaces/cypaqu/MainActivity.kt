@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
@@ -17,16 +19,21 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import nl.utwente.smartspaces.cypaqu.ui.Chart
 import nl.utwente.smartspaces.cypaqu.ui.theme.CyPaQuTheme
 
 class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		enableEdgeToEdge()
+
 		setContent {
 			CyPaQuTheme {
 				Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
-					Map(padding)
+					Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
+						Chart()
+						Map(padding)
+					}
 				}
 			}
 		}
@@ -40,6 +47,7 @@ fun Map(padding: PaddingValues) {
 	val cameraPositionState = rememberCameraPositionState {
 		position = CameraPosition.fromLatLngZoom(utwente, 15f)
 	}
+
 	GoogleMap(
 		modifier = Modifier.fillMaxSize(),
 		cameraPositionState = cameraPositionState,

@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-  <uses-permission android:name="android.permission.INTERNET" />
-  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
   <application
     android:allowBackup="true"
     android:dataExtractionRules="@xml/data_extraction_rules"
@@ -17,8 +12,13 @@
     android:theme="@style/Theme.CyPaQu"
     android:usesCleartextTraffic="false">
     <activity
-      android:name=".MainActivity"
+      android:exported="false"
+      android:label="@string/title_activity_chart_view_model"
+      android:name=".ui.ChartViewModel"
+      android:theme="@style/Theme.CyPaQu" />
+    <activity
       android:exported="true"
+      android:name=".MainActivity"
       android:theme="@style/Theme.CyPaQu">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -34,4 +34,11 @@
       android:name="com.google.android.gms.version"
       android:value="@integer/google_play_services_version" />
   </application>
+
+  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
 </manifest>

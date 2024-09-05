@@ -1,3 +1,4 @@
 <resources>
   <string name="app_name" translatable="false">CyPaQu</string>
+  <string name="title_activity_chart_view_model">ChartViewModel</string>
 </resources>
