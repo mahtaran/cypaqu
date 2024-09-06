@@ -3,6 +3,7 @@ package nl.utwente.smartspaces.cypaqu.ui
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -10,6 +11,8 @@ import android.hardware.SensorManager
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -23,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,6 +41,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
@@ -55,6 +60,7 @@ fun Anomalies(
 	anomaliesViewModel: AnomaliesViewModel = viewModel()
 ) {
 	val context = LocalContext.current
+	val configuration = LocalConfiguration.current
 
 	val locationPermissionState = rememberMultiplePermissionsState(
 		listOf(
@@ -78,7 +84,7 @@ fun Anomalies(
 							CurrentLocationRequest.Builder().build(),
 							null
 						).addOnSuccessListener { location ->
-							anomaliesViewModel.testMeasurement(
+							anomaliesViewModel.addMeasurement(
 								AccelerometerData(
 									it.values[0],
 									it.values[1],
@@ -113,9 +119,33 @@ fun Anomalies(
 	}
 
 	if (locationPermissionState.allPermissionsGranted) {
-		Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-			Chart()
-			Map(padding)
+		when (configuration.orientation) {
+			Configuration.ORIENTATION_PORTRAIT -> {
+				Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
+					Chart(modifier = Modifier.defaultMinSize())
+					Map(
+						padding = padding,
+						modifier = Modifier.fillMaxSize()
+					)
+				}
+			}
+
+			Configuration.ORIENTATION_LANDSCAPE -> {
+				Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+					Chart(modifier = Modifier.weight(1f))
+					Map(
+						padding = padding,
+						modifier = Modifier.weight(2f)
+					)
+				}
+			}
+
+			else -> {
+				Text(
+					text = "Unsupported orientation",
+					textAlign = TextAlign.Center
+				)
+			}
 		}
 
 		CartesianChartHost(
@@ -153,6 +183,7 @@ fun Anomalies(
 
 @Composable
 fun Chart(
+	modifier: Modifier = Modifier.fillMaxSize(),
 	anomaliesViewModel: AnomaliesViewModel = viewModel()
 ) {
 	CartesianChartHost(
@@ -161,16 +192,18 @@ fun Chart(
 				axisValueOverrider = AxisValueOverrider.fixed(
 					minY = 0.0,
 					maxY = 20.0
-				)
+				),
 			),
 		),
 		modelProducer = anomaliesViewModel.modelProducer,
+		modifier = modifier
 	)
 }
 
 @Composable
 fun Map(
 	padding: PaddingValues,
+	modifier: Modifier = Modifier.fillMaxSize(),
 	anomaliesViewModel: AnomaliesViewModel = viewModel()
 ) {
 	val uiState by anomaliesViewModel.uiState.collectAsState()
@@ -184,18 +217,28 @@ fun Map(
 		}
 	}
 
-	val utwente = LatLng(52.2383, 6.8507)
-	val utwenteMarkerState = rememberMarkerState(position = utwente)
-	
-	GoogleMap(
-		modifier = Modifier.fillMaxSize(),
-		cameraPositionState = cameraPositionState,
-		contentPadding = padding,
-	) {
-		Marker(
-			state = utwenteMarkerState,
-			title = "University of Twente",
-			snippet = "The most beautiful campus in the Netherlands",
+	Column {
+		Text(
+			text = uiState.anomalies.size.toString()
 		)
+		GoogleMap(
+			modifier = modifier,
+			cameraPositionState = cameraPositionState,
+			contentPadding = padding,
+		) {
+			uiState.anomalies.forEach { anomaly ->
+				Marker(
+					state = MarkerState(position = anomaly),
+					title = "Anomaly",
+					snippet = "Anomaly detected here"
+				)
+			}
+
+			Marker(
+				state = rememberMarkerState(position = LatLng(52.2383, 6.8507)),
+				title = "University of Twente",
+				snippet = "The most beautiful campus in the Netherlands",
+			)
+		}
 	}
 }
