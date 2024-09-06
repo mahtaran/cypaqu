@@ -15,11 +15,6 @@
     android:theme="@style/Theme.CyPaQu"
     android:usesCleartextTraffic="false">
     <activity
-      android:exported="false"
-      android:label="@string/title_activity_chart_view_model"
-      android:name=".ui.AnomaliesViewModel"
-      android:theme="@style/Theme.CyPaQu" />
-    <activity
       android:exported="true"
       android:name=".MainActivity"
       android:theme="@style/Theme.CyPaQu">
